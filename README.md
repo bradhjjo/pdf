@@ -24,7 +24,9 @@ npm run typecheck
 it is not checked in.
 
 Copy `.env.example` to `.env.local` and fill it in before deploying:
-`NEXT_PUBLIC_SITE_URL` feeds `sitemap.xml` and `robots.txt`, and
+`NEXT_PUBLIC_SITE_URL` is the canonical origin, used for page metadata,
+`sitemap.xml` and `robots.txt` — without it those fall back to
+`http://localhost:3000`, so set it on the first deploy. And
 `NEXT_PUBLIC_SIGNUP_ENDPOINT` is where early-access sign-ups are POSTed. With
 no endpoint set the sign-up form still works and keeps addresses in the
 visitor's own browser, so nothing is lost while the backend is undecided.

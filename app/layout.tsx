@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://example.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Split & Rename PDF — in your browser",
     template: "%s | Local PDF Tools",
