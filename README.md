@@ -31,11 +31,34 @@ origin resolves itself from `VERCEL_PROJECT_PRODUCTION_URL` at build time, so
 page metadata, `sitemap.xml` and `robots.txt` are right on the first deploy;
 set `NEXT_PUBLIC_SITE_URL` only once there is a custom domain.
 
-The one variable worth setting by hand is `NEXT_PUBLIC_SIGNUP_ENDPOINT`, where
-early-access sign-ups are POSTed as `{email, source, at}`. With no endpoint the
-form still works and keeps addresses in the visitor's own browser — but the
-sign-up panels promise an email, so point it somewhere real before sending
-anyone to the site. See `.env.example`.
+Nothing else needs setting: sign-ups already point at the Supabase function
+below. See `.env.example` for the overrides that exist.
+
+## Sign-ups
+
+The three panels for unbuilt features POST `{email, source}` to a Supabase edge
+function, whose source is in `supabase/functions/signup`. The function is the
+only writer: it validates the payload, then inserts with the service role into
+`public.signups`, a table with RLS enabled and no policies, so anonymous callers
+cannot read or write it directly.
+
+It is a public endpoint — there is no visitor to authenticate — so the guards
+are in the function: an allow-list of sources, an email format check, a 2 KB
+body cap, and a global burst cap of 30 inserts a minute, which no real traffic
+approaches. A repeat sign-up for the same feature is a unique-constraint
+violation and is treated as success rather than an error. Nothing identifying
+beyond the address is stored: no IP, and the timestamp is the server's, not the
+browser's.
+
+If the request fails, the panel says so instead of thanking the visitor, and
+the address is kept in their own browser so a retry costs them nothing.
+
+To read what has come in:
+
+```sql
+select source, count(*), max(created_at)
+from public.signups group by source order by count desc;
+```
 
 ## How it is put together
 

@@ -23,7 +23,7 @@ export function FakeDoor({
 }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "done" | "invalid">("idle");
+  const [state, setState] = useState<"idle" | "sending" | "done" | "invalid" | "failed">("idle");
 
   return (
     <section className="rounded-xl border border-line bg-surface p-4">
@@ -55,10 +55,11 @@ export function FakeDoor({
             setState("sending");
             try {
               await submitSignup(email, source);
+              setState("done");
             } catch {
-              // The address is kept locally either way; do not block the visitor.
+              // Saying "thanks" when nothing was saved would be a lie.
+              setState("failed");
             }
-            setState("done");
           }}
         >
           <p className="text-sm">
@@ -86,6 +87,11 @@ export function FakeDoor({
           </div>
           {state === "invalid" && (
             <p className="mt-2 text-sm text-warn">That does not look like an email address.</p>
+          )}
+          {state === "failed" && (
+            <p className="mt-2 text-sm text-warn">
+              That did not save — something on our end. Try again in a moment.
+            </p>
           )}
         </form>
       )}
