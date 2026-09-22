@@ -12,6 +12,22 @@ export const metadata: Metadata = {
   },
   description:
     "Split a large PDF into separate documents and name them automatically. Runs entirely in your browser — files are never uploaded.",
+  applicationName: "Local PDF Tools",
+  // Links get shared into Reddit and Hacker News threads, so the card matters.
+  openGraph: {
+    type: "website",
+    siteName: "Local PDF Tools",
+    url: SITE_URL,
+    title: "Split & Rename PDF — in your browser",
+    description:
+      "Split a large PDF into separate documents and name them automatically. Nothing is uploaded.",
+  },
+  twitter: {
+    card: "summary",
+    title: "Split & Rename PDF — in your browser",
+    description:
+      "Split a large PDF into separate documents and name them automatically. Nothing is uploaded.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

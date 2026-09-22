@@ -23,13 +23,19 @@ npm run typecheck
 `npm run dev` and `npm run build` copy the pdf.js worker into `public/` first;
 it is not checked in.
 
-Copy `.env.example` to `.env.local` and fill it in before deploying:
-`NEXT_PUBLIC_SITE_URL` is the canonical origin, used for page metadata,
-`sitemap.xml` and `robots.txt` — without it those fall back to
-`http://localhost:3000`, so set it on the first deploy. And
-`NEXT_PUBLIC_SIGNUP_ENDPOINT` is where early-access sign-ups are POSTed. With
-no endpoint set the sign-up form still works and keeps addresses in the
-visitor's own browser, so nothing is lost while the backend is undecided.
+### Deploying
+
+Import the repository at [vercel.com/new](https://vercel.com/new). Next.js is
+detected automatically and no build settings need changing. The canonical
+origin resolves itself from `VERCEL_PROJECT_PRODUCTION_URL` at build time, so
+page metadata, `sitemap.xml` and `robots.txt` are right on the first deploy;
+set `NEXT_PUBLIC_SITE_URL` only once there is a custom domain.
+
+The one variable worth setting by hand is `NEXT_PUBLIC_SIGNUP_ENDPOINT`, where
+early-access sign-ups are POSTed as `{email, source, at}`. With no endpoint the
+form still works and keeps addresses in the visitor's own browser — but the
+sign-up panels promise an email, so point it somewhere real before sending
+anyone to the site. See `.env.example`.
 
 ## How it is put together
 
