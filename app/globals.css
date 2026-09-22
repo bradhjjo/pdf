@@ -1,29 +1,56 @@
 @import "tailwindcss";
 
-@theme {
-  --color-ink: #10131a;
-  --color-ink-soft: #545b6b;
-  --color-line: #e3e6ed;
-  --color-surface: #ffffff;
-  --color-canvas: #f6f7fa;
-  --color-accent: #2b5cf0;
-  --color-accent-soft: #edf1fe;
-  --color-warn: #b45309;
-  --color-warn-soft: #fef3c7;
+/*
+ * Tailwind v4 hoists every `@theme` block, so a second one inside a media
+ * query silently overwrote the first and the site was dark for everyone.
+ * Tokens live on :root as plain custom properties instead, and `@theme inline`
+ * only maps them to utility names.
+ */
+:root {
+  --ink: #12151c;
+  --ink-soft: #5b6478;
+  --line: #e2e6ee;
+  --surface: #ffffff;
+  --canvas: #f5f7fa;
+  --accent: #2b5cf0;
+  --accent-ink: #ffffff;
+  --accent-soft: #eaf0fe;
+  --warn: #a2560a;
+  --warn-soft: #fff5e3;
+  --ok: #14743f;
+  --ok-soft: #e7f6ed;
 }
 
 @media (prefers-color-scheme: dark) {
-  @theme {
-    --color-ink: #eef1f7;
-    --color-ink-soft: #99a1b3;
-    --color-line: #262b36;
-    --color-surface: #161a22;
-    --color-canvas: #0d1016;
-    --color-accent: #6b8dff;
-    --color-accent-soft: #1b2438;
-    --color-warn: #fbbf24;
-    --color-warn-soft: #2a220f;
+  :root {
+    --ink: #eef1f7;
+    --ink-soft: #99a1b3;
+    --line: #272d3a;
+    --surface: #171b24;
+    --canvas: #0e1117;
+    --accent: #6b8dff;
+    --accent-ink: #0e1117;
+    --accent-soft: #1c2740;
+    --warn: #f5bb50;
+    --warn-soft: #2c2310;
+    --ok: #5fd08d;
+    --ok-soft: #10281b;
   }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-canvas: var(--canvas);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
 }
 
 html {
@@ -31,7 +58,32 @@ html {
 }
 
 body {
-  background: var(--color-canvas);
-  color: var(--color-ink);
+  background: var(--canvas);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Every interactive element gets the same visible focus ring. */
+:where(button, a, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/*
+ * Page tools stay out of the way on a mouse, where hover reveals them, but a
+ * touch screen has no hover — so there they are simply always visible.
+ */
+.tile-tools {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.group:hover .tile-tools,
+.group:focus-within .tile-tools {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .tile-tools {
+    opacity: 1;
+  }
 }

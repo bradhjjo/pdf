@@ -33,22 +33,34 @@ export function createPages(sourcePageCount: number): PageRef[] {
 }
 
 /**
- * Splits the ordered page list at every cut. `cuts` holds the id of the page
- * each cut follows, so cuts survive reordering and deletion of other pages.
+ * Groups the ordered page list into documents. `starts` holds the ids of pages
+ * that begin a new document — the way people actually think about a stack of
+ * scanned invoices — and the first page always starts one. Marking by page id
+ * means a mark survives reordering and the deletion of other pages.
  */
-export function buildSegments(pages: PageRef[], cuts: ReadonlySet<string>): Segment[] {
+export function buildSegments(pages: PageRef[], starts: ReadonlySet<string>): Segment[] {
   const segments: Segment[] = [];
   let current: PageRef[] = [];
 
-  for (const page of pages) {
-    current.push(page);
-    if (cuts.has(page.id)) {
+  for (const [index, page] of pages.entries()) {
+    if (index > 0 && starts.has(page.id) && current.length) {
       segments.push({ pages: current, index: segments.length });
       current = [];
     }
+    current.push(page);
   }
   if (current.length) segments.push({ pages: current, index: segments.length });
   return segments;
+}
+
+/** True when this page opens a document, which the first page always does. */
+export function startsDocument(
+  pages: PageRef[],
+  index: number,
+  starts: ReadonlySet<string>,
+) {
+  if (index === 0) return true;
+  return starts.has(pages[index].id);
 }
 
 /**

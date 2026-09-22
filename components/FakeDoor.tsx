@@ -37,7 +37,7 @@ export function FakeDoor({
             setOpen(true);
             trackEvent(event);
           }}
-          className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white"
+          className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-accent-ink"
         >
           {cta}
         </button>
@@ -80,7 +80,7 @@ export function FakeDoor({
             <button
               type="submit"
               disabled={state === "sending"}
-              className="rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="rounded-lg bg-accent px-3 py-2 text-sm font-medium text-accent-ink disabled:opacity-60"
             >
               {state === "sending" ? "Sending…" : "Notify me"}
             </button>

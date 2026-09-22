@@ -6,7 +6,7 @@ export function Dropzone({
   onFiles,
   multiple = false,
   label = "Drop a PDF here",
-  hint = "or click to choose a file",
+  hint = "Your file is opened by this browser and never uploaded",
 }: {
   onFiles: (files: File[]) => void;
   multiple?: boolean;
@@ -39,18 +39,23 @@ export function Dropzone({
         setOver(false);
         accept(e.dataTransfer.files);
       }}
-      className={`rounded-2xl border-2 border-dashed p-10 text-center transition-colors ${
-        over ? "border-accent bg-accent-soft" : "border-line bg-surface"
+      onClick={() => inputRef.current?.click()}
+      className={`cursor-pointer rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors ${
+        over ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-accent/60"
       }`}
     >
+      <p className="text-lg font-medium">{label}</p>
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
-        className="flex w-full cursor-pointer flex-col items-center gap-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          inputRef.current?.click();
+        }}
+        className="mt-4 rounded-lg bg-accent px-5 py-2.5 font-medium text-accent-ink"
       >
-        <span className="text-lg font-medium">{label}</span>
-        <span className="text-sm text-ink-soft">{hint}</span>
+        Choose {multiple ? "files" : "a file"}
       </button>
+      <p className="mt-4 text-sm text-ink-soft">{hint}</p>
       <input
         ref={inputRef}
         type="file"

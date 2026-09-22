@@ -44,13 +44,14 @@ export function ResultList({
     <section className="rounded-xl border border-line bg-surface">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <h2 className="font-medium">
-          {files.length} {files.length === 1 ? "document" : "documents"} ready
+          ✓ {files.length} {files.length === 1 ? "PDF" : "PDFs"} ready — rename any of
+          them below
         </h2>
         <button
           type="button"
           onClick={download}
           disabled={zipping}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-ink disabled:opacity-60"
         >
           {zipping ? "Preparing…" : files.length === 1 ? "Download PDF" : "Download ZIP"}
         </button>

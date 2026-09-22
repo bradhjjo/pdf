@@ -8,18 +8,23 @@ import {
 } from "../lib/segments";
 
 describe("buildSegments", () => {
-  it("returns one segment when there are no cuts", () => {
+  it("returns one document when nothing is marked", () => {
     const pages = createPages(5);
     expect(buildSegments(pages, new Set())).toHaveLength(1);
   });
 
-  it("cuts after the marked page", () => {
+  it("starts a new document at the marked page", () => {
     const pages = createPages(5);
-    const segments = buildSegments(pages, new Set(["p1"]));
+    const segments = buildSegments(pages, new Set(["p2"]));
     expect(segments.map((s) => s.pages.length)).toEqual([2, 3]);
   });
 
-  it("ignores a cut on a page that was deleted", () => {
+  it("ignores a mark on the first page, which always starts one", () => {
+    const pages = createPages(4);
+    expect(buildSegments(pages, new Set(["p0"]))).toHaveLength(1);
+  });
+
+  it("ignores a mark on a page that was deleted", () => {
     const pages = createPages(4).filter((p) => p.id !== "p1");
     const segments = buildSegments(pages, new Set(["p1"]));
     expect(segments).toHaveLength(1);
@@ -27,7 +32,7 @@ describe("buildSegments", () => {
 
   it("follows the page after reordering", () => {
     const pages = moveItem(createPages(4), 3, 0);
-    const segments = buildSegments(pages, new Set(["p3"]));
+    const segments = buildSegments(pages, new Set(["p0"]));
     expect(segments.map((s) => s.pages.map((p) => p.sourceIndex))).toEqual([
       [3],
       [0, 1, 2],

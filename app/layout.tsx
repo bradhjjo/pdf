@@ -35,11 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen antialiased">
         <header className="border-b border-line">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-            <Link href="/" className="font-semibold tracking-tight">
+          <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+            <Link href="/" className="shrink-0 font-semibold tracking-tight">
               Local PDF Tools
             </Link>
-            <nav className="flex flex-wrap gap-4 text-sm text-ink-soft">
+            {/* Scrolls sideways on a phone rather than wrapping to two lines. */}
+            <nav className="flex min-w-0 flex-1 justify-end gap-4 overflow-x-auto text-sm whitespace-nowrap text-ink-soft [scrollbar-width:none]">
               <Link href="/split-pdf" className="hover:text-ink">Split</Link>
               <Link href="/merge-pdf" className="hover:text-ink">Merge</Link>
               <Link href="/extract-pages" className="hover:text-ink">Extract</Link>

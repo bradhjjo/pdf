@@ -26,14 +26,15 @@ type SplitState = {
   doc: LoadedPdf | null;
   renderer: ThumbnailRenderer | null;
   pages: PageRef[];
-  cuts: Set<string>;
+  /** Ids of pages that begin a new document. */
+  starts: Set<string>;
   results: BuiltFile[] | null;
   progress: { done: number; total: number } | null;
 
   open: (file: File) => Promise<void>;
   reset: () => void;
-  toggleCut: (pageId: string) => void;
-  clearCuts: () => void;
+  toggleStart: (pageId: string) => void;
+  clearStarts: () => void;
   splitEvery: (size: number) => void;
   deletePage: (pageId: string) => void;
   rotatePage: (pageId: string) => void;
@@ -47,7 +48,7 @@ export const useSplitStore = create<SplitState>((set, get) => ({
   doc: null,
   renderer: null,
   pages: [],
-  cuts: new Set(),
+  starts: new Set(),
   results: null,
   progress: null,
 
@@ -61,7 +62,7 @@ export const useSplitStore = create<SplitState>((set, get) => ({
         doc,
         renderer: new ThumbnailRenderer(doc.proxy),
         pages: createPages(doc.pageCount),
-        cuts: new Set(),
+        starts: new Set(),
       });
       trackEvent("pdf_selected", { pages: bucketPageCount(doc.pageCount) });
     } catch (err) {
@@ -81,39 +82,41 @@ export const useSplitStore = create<SplitState>((set, get) => ({
       doc: null,
       renderer: null,
       pages: [],
-      cuts: new Set(),
+      starts: new Set(),
       results: null,
       progress: null,
     });
   },
 
-  toggleCut(pageId) {
-    const cuts = new Set(get().cuts);
-    if (cuts.has(pageId)) cuts.delete(pageId);
-    else cuts.add(pageId);
-    set({ cuts, results: null, status: "ready" });
+  toggleStart(pageId) {
+    // The first page always starts a document; marking it would be a no-op.
+    if (get().pages[0]?.id === pageId) return;
+    const starts = new Set(get().starts);
+    if (starts.has(pageId)) starts.delete(pageId);
+    else starts.add(pageId);
+    set({ starts, results: null, status: "ready" });
   },
 
-  clearCuts() {
-    set({ cuts: new Set(), results: null, status: "ready" });
+  clearStarts() {
+    set({ starts: new Set(), results: null, status: "ready" });
   },
 
   splitEvery(size) {
     const { pages } = get();
     if (size < 1) return;
-    const cuts = new Set<string>();
+    const starts = new Set<string>();
     pages.forEach((page, index) => {
-      if ((index + 1) % size === 0 && index !== pages.length - 1) cuts.add(page.id);
+      if (index > 0 && index % size === 0) starts.add(page.id);
     });
-    set({ cuts, results: null, status: "ready" });
+    set({ starts, results: null, status: "ready" });
   },
 
   deletePage(pageId) {
-    const cuts = new Set(get().cuts);
-    cuts.delete(pageId);
+    const starts = new Set(get().starts);
+    starts.delete(pageId);
     set({
       pages: get().pages.filter((page) => page.id !== pageId),
-      cuts,
+      starts,
       results: null,
       status: "ready",
     });
@@ -134,10 +137,10 @@ export const useSplitStore = create<SplitState>((set, get) => ({
   },
 
   async build() {
-    const { doc, pages, cuts } = get();
+    const { doc, pages, starts } = get();
     if (!doc || !pages.length) return;
 
-    const segments = buildSegments(pages, cuts);
+    const segments = buildSegments(pages, starts);
     set({ status: "building", progress: { done: 0, total: segments.length } });
     trackEvent("split_created", {
       pages: bucketPageCount(doc.pageCount),
@@ -180,7 +183,7 @@ async function nameSegments(doc: LoadedPdf, segments: Segment[]): Promise<string
 }
 
 export function selectSegments(state: SplitState): Segment[] {
-  return buildSegments(state.pages, state.cuts);
+  return buildSegments(state.pages, state.starts);
 }
 
 export function selectCoverage(state: SplitState): Coverage | null {
