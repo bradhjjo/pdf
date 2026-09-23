@@ -42,7 +42,8 @@ Day 1–4 are done and deployed:
 - Five funnel events, sitemap/robots/OG
 - A full UX pass after driving the deployed build in a browser
 
-**Day 5–7 is distribution, not code.** That is the open task.
+**Day 5–7 is distribution, not code.** That is the open task; the plan, post
+copy and tracking table are in `docs/DISTRIBUTION.md`.
 
 ## Data so far
 
@@ -129,6 +130,10 @@ email, so someone must actually answer if people sign up.
   `curl`, Playwright and WebFetch against the live site all fail with
   `connect_rejected`. Use the Vercel MCP tool `web_fetch_vercel_url` to read the
   live site, and Supabase MCP `execute_sql` for the database.
+- **The Vercel connector cannot read Web Analytics.** `count_pageviews`,
+  `aggregate_pageviews` and `aggregate_events` all return 404 "Web Analytics
+  not found" for this project, although the insights script is served in
+  production. Funnel numbers have to be read in the dashboard by the owner.
 - **The Vercel connector is read-only.** Creating projects, updating project
   settings and buying domains all return 403 (`get_auth_user` returns 404 "User
   not found" — it authenticates as an integration, not as the account). Anything
